@@ -12,8 +12,8 @@ const app = new Koa()
 app.use(logger())
 
 // 配置试图模板
-app.use(static(join(__dirname,'views'),{
-    extensions:'pug'
+app.use(views(join(__dirname,'views'),{
+    extension:'pug'
 }))
 // 配置静态资源目录
 app.use(static(join(__dirname,'public')))
