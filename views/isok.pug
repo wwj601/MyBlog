@@ -1,0 +1,12 @@
+extends ./layout/layout
+
+block contents
+
+  h1(style="text-align:center;color:red")= status
+  h1(style="text-align:center;") 即将跳转
+
+block scripts
+  script.
+    setTimeout(()=>{
+      location="/"
+    },2000)

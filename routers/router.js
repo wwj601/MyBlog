@@ -1,4 +1,6 @@
 const Router = require('koa-router')
+const user = require('../control/user')
+
 const router = new Router()
 
 router.get('/',async (ctx) => {
@@ -21,8 +23,11 @@ router.get(/^\/user\/(?=reg|login)/, async (ctx) =>{
     await ctx.render('register',{show})
 })
 
+// 用户注册 路由
+router.post('/user/reg',user.reg)
 
-
+// 用户登录 路由
+router.post('/user/login',user.login)
 
 
 module.exports = router
