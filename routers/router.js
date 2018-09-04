@@ -1,18 +1,13 @@
 const Router = require('koa-router')
 const user = require('../control/user')
-
+const article = require('../control/article')
 const router = new Router()
 
 router.get('/',async (ctx) => {
     
     await ctx.render('index',{
         title:'个人博客',
-        session:{
-            isNew:true,
-            role:666,
-            avatar:'/img/1.jpg',
-            username:'阿杰'
-        }
+        session:ctx.session
     })
     
 })
@@ -28,6 +23,12 @@ router.post('/user/reg',user.reg)
 
 // 用户登录 路由
 router.post('/user/login',user.login)
+
+// 用户退出
+router.get("/user/logout", user.logout)
+
+// 文章的发表页面
+router.get('/article',user.keepLog,article.addPage)
 
 
 module.exports = router

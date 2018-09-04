@@ -71,40 +71,90 @@ exports.login = async (ctx) =>{
 
   await new Promise((resolve,reject)=>{
     User.find({username},(err,data)=>{
-
+      // 数据库查询失败
       if(err) return reject(err)
+      // 查询数据库无此用户名
       if(data.length === 0) return reject('用户名不存在')
 
       // 把用户传过来的密码 加密后跟数据库的比对 密码正确
       if(data[0].password === encrypt(password)){
-
         return resolve(data)
       }
+   
       // 密码错误
       resolve('')
 
     })
   })
   .then( async data =>{
-    console.log(!data)
+
     if(!data){
-      await ctx.render('isok',{
+      return ctx.render('isok',{
         status:'密码不正确，登录失败'
       }) 
-    }else{
+    }
 
-      // 密码正确登录成功
-      await ctx.render('isok',{
-        status:'登陆成功'
-      })
+    // 让用户在他的 cookie 里设置 username password 加密后的密码权限
+    ctx.cookies.set('username',username,{
+      domain:'localhost',
+      path:'/',
+      maxAge:36e5,
+      httpOnly:true, //true 不让客户端访问这个 cookie
+      overwrite:false
+    })
+    // 用户在数据库的id值
+    ctx.cookies.set('uid',data[0]._id,{
+      domain:'localhost',
+      path:'/',
+      maxAge:36e5,
+      httpOnly:true, //true 不让客户端访问这个 cookie
+      overwrite:false
+    })
+
+    ctx.session = {
+      username,
+      uid:data[0]._id,
+      avatar:data[0].avatar
     }
     
-    
+    // 密码正确登录成功
+    await ctx.render('isok',{
+      status:'登陆成功'
+    })
+      
     
   })
   .catch( async err=>{
+
     await ctx.render('isok',{
       status:'登录失败'
     })
-  } )
+  })
+}
+
+exports.logout = async ctx =>{
+  ctx.session = null
+  ctx.cookies.set('username',null,{
+    maxAge:0
+  })
+
+  ctx.cookies.set('sid',null,{
+    maxAge:0
+  })
+
+  // 在后台做重定向 跟
+  ctx.redirect('/')
+}
+
+// 确定用户的状态 保持用户的状态
+exports.keepLog = async (ctx,next)=>{
+  if(ctx.session.isNew){
+    if(ctx.cookies.get('username')){
+      ctx.session = {
+        username:ctx.cookies.get('username'),
+        uid:cts.cookies.get('uid')
+      }
+    }
+  }
+  await next()
 }

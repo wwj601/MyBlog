@@ -5,12 +5,28 @@ const views = require('koa-views')
 const body = require('koa-body')
 const router = require('./routers/router')
 const { join } = require('path')
+const session = require('koa-session')
 
 // 生成koa实例
 const app = new Koa()
 
-// 生成日志模板
-app.use(logger())
+
+app.keys = ['it is Adger'];
+// session 的配置对象
+const CONFIG = {
+    key: "Sid",
+    maxAge: 36e5,
+    overwrite: true,
+    httpOnly: true,
+    // signed: true,
+    rolling: true
+}
+
+// 注册session
+app.use(session(CONFIG, app))
+
+// // 生成日志模板
+// app.use(logger())
 
 
 // 配置 koa-body 处理 post 请求数据
