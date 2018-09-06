@@ -15,7 +15,9 @@ layui.use(["element", "laypage"], () => {
     curr: location.pathname.replace("/page/", ""),
     jump(obj, f){
       $("#laypage a").each((i, v) => {
-        let pageValue = `/page/${$(v).data("page")}`
+        let page = $(v).data("page")
+        if( page === 0) page = 1
+        let pageValue = `/page/${page}`
         v.href = pageValue
       })
     }

@@ -100,7 +100,8 @@ exports.login = async (ctx) =>{
       path:'/',
       maxAge:36e5,
       httpOnly:true, //true 不让客户端访问这个 cookie
-      overwrite:false
+      overwrite:false,
+      signed:false
     })
     // 用户在数据库的id值
     ctx.cookies.set('uid',data[0]._id,{
@@ -108,7 +109,8 @@ exports.login = async (ctx) =>{
       path:'/',
       maxAge:36e5,
       httpOnly:true, //true 不让客户端访问这个 cookie
-      overwrite:false
+      overwrite:false,
+      signed:false
     })
 
     ctx.session = {
@@ -132,6 +134,7 @@ exports.login = async (ctx) =>{
   })
 }
 
+// 用户退出
 exports.logout = async ctx =>{
   ctx.session = null
   ctx.cookies.set('username',null,{
@@ -148,7 +151,8 @@ exports.logout = async ctx =>{
 
 // 确定用户的状态 保持用户的状态
 exports.keepLog = async (ctx,next)=>{
-  if(ctx.session.isNew){
+  if(ctx.session.isNew){// session没有 
+    // cookie查询登录用户是否存在
     if(ctx.cookies.get('username')){
       ctx.session = {
         username:ctx.cookies.get('username'),

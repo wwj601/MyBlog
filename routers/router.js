@@ -3,14 +3,8 @@ const user = require('../control/user')
 const article = require('../control/article')
 const router = new Router()
 
-router.get('/',async (ctx) => {
-    
-    await ctx.render('index',{
-        title:'个人博客',
-        session:ctx.session
-    })
-    
-})
+// 渲染主页
+router.get('/',user.keepLog,article.getList)
 
 router.get(/^\/user\/(?=reg|login)/, async (ctx) =>{
     // show 为 true 则显示注册   false 显示登录
@@ -30,5 +24,10 @@ router.get("/user/logout", user.logout)
 // 文章的发表页面
 router.get('/article',user.keepLog,article.addPage)
 
+// 文章添加
+router.post('/article',user.keepLog,article.add)
+
+// 文章列表 分页 路由
+router.get('/page/:id',article.getList)
 
 module.exports = router

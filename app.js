@@ -18,7 +18,7 @@ const CONFIG = {
     maxAge: 36e5,
     overwrite: true,
     httpOnly: true,
-    // signed: true,
+    signed: false,
     rolling: true
 }
 
