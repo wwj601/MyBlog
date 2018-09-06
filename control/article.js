@@ -39,7 +39,7 @@ exports.add = async ctx =>{
     new Article(data).save( (err,data)=>{
       if(err) return reject(err)
       // 更新用户文章计数
-      User.update({_id:data.author},{$inc:{articleNum:1}},err=>{
+      User.updateOne({_id:data.author},{$inc:{articleNum:1}},err=>{
         if(err) return console.log(err)
         console.log('文章计数更新成功')
       })

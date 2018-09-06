@@ -39,14 +39,14 @@ exports.save = async ctx =>{
 
       // 更新当前文章的评论计数器
       Article
-        .update({_id:data.article},{$inc:{commentNum:1}}, err=>{
+        .updateOne({_id:data.article},{$inc:{commentNum:1}}, err=>{
           if(err) return console.log(err)
           console.log('评论计数器更新成功')
         })
 
       // 更新用户的评论计数器
       User
-        .update({_id:data.from},{$inc:{commentNum:1}},err =>{
+        .updateOne({_id:data.from},{$inc:{commentNum:1}},err =>{
           if(err) return console.log(err)
         })
 
