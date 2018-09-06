@@ -1,6 +1,8 @@
 const Router = require('koa-router')
 const user = require('../control/user')
 const article = require('../control/article')
+const comment = require('../control/comment')
+const admin = require('../control/admin')
 const router = new Router()
 
 // 渲染主页
@@ -29,5 +31,21 @@ router.post('/article',user.keepLog,article.add)
 
 // 文章列表 分页 路由
 router.get('/page/:id',article.getList)
+
+// 文章详情页 路由
+router.get("/article/:id", user.keepLog, article.details)
+
+// 提交评论
+router.post('/comment',user.keepLog, comment.save)
+
+// 个人中心 文章 评论 头像上传
+router.get('/admin/:id',user.keepLog,admin.index)
+
+// 404页面
+router.get('*',async ctx=>{
+    await ctx.body('404',{
+        title:404
+    })
+})
 
 module.exports = router

@@ -9,6 +9,10 @@ const User = db.model("users", UserSchema)
 // 通过 db 对象创建操作article数据库的模型对象
 const Article = db.model("articles", ArticleSchema)
 
+// 取评论的Schema 创建评论数据库
+const CommentSchema = require('../Schema/comment')
+const Comment = db.model('comments',CommentSchema)
+
 exports.addPage = async ctx =>{
   await ctx.render('add-article',{
     title:'文章发表页',
@@ -34,6 +38,11 @@ exports.add = async ctx =>{
   await new Promise((resolve,reject) =>{
     new Article(data).save( (err,data)=>{
       if(err) return reject(err)
+      // 更新用户文章计数
+      User.update({_id:data.author},{$inc:{articleNum:1}},err=>{
+        if(err) return console.log(err)
+        console.log('文章计数更新成功')
+      })
       resolve(data)
     }) 
   })
@@ -83,4 +92,32 @@ exports.getList = async ctx=>{
   })
 
 
+}
+
+// 文章详情页
+exports.details = async ctx=>{
+  // 获取动态路由里的id
+  const _id = ctx.params.id
+
+  // 查找文章本身的数据
+  const article = await Article
+    .findById(_id)
+    .populate('author','username')
+    .then(data => data)
+    .catch(err => console.log(err))
+
+  // 查找当前文章关联的所有评论
+  const comment = await Comment
+    .find({article:_id})
+    .sort('-created')
+    .populate('from','username avatar')
+    .then(data => data)
+    .catch(err => console.log(err))
+
+  await ctx.render('article',{
+    title:article.title,
+    comment,
+    article,
+    session:ctx.session
+  })
 }

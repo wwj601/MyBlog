@@ -116,7 +116,8 @@ exports.login = async (ctx) =>{
     ctx.session = {
       username,
       uid:data[0]._id,
-      avatar:data[0].avatar
+      avatar:data[0].avatar,
+      role:data[0].role
     }
     
     // 密码正确登录成功
@@ -141,7 +142,7 @@ exports.logout = async ctx =>{
     maxAge:0
   })
 
-  ctx.cookies.set('sid',null,{
+  ctx.cookies.set('uid',null,{
     maxAge:0
   })
 
