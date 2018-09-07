@@ -61,3 +61,51 @@ exports.save = async ctx =>{
   ctx.body = message
   
 }
+
+// 获取评论列表
+exports.comlist = async ctx =>{
+  const uid = ctx.session.uid
+
+  const data = await Comment.find({from:uid}).populate('article','title')
+
+  ctx.body = {
+    code:0,
+    count:data.length,
+    data
+  }
+}
+
+// 删除评论
+exports.del = async ctx =>{
+  const commentId = ctx.params.id
+  const userId = ctx.session.uid
+  let articleId,
+      res = {};
+  // 获取文章
+  await Comment.findById(commentId, (err,data)=>{
+    if(err) {
+      
+      res = {
+        state:0,
+        message:'删除失败'
+      }
+      return
+    }else{
+      console.log(data)
+      articleId = data.article
+      res = {
+        state:1,
+        message:'删除成功'
+      }
+    }
+  })
+
+  // 更新对应文章评论计数
+  await Article.updateOne({_id:articleId}, {$inc:{ commentNum:-1}})
+  await User.updateOne({_id:userId},{$inc:{commentNum:-1}})
+
+  // 删除评论
+  await Comment.deleteOne({_id:commentId})
+ 
+  ctx.body = res
+}

@@ -119,7 +119,6 @@ exports.login = async (ctx) =>{
       avatar:data[0].avatar,
       role:data[0].role
     }
-    
     // 密码正确登录成功
     await ctx.render('isok',{
       status:'登陆成功'
@@ -152,14 +151,43 @@ exports.logout = async ctx =>{
 
 // 确定用户的状态 保持用户的状态
 exports.keepLog = async (ctx,next)=>{
-  if(ctx.session.isNew){// session没有 
+  if(!ctx.session.isNew){// session有(已经登录) 
     // cookie查询登录用户是否存在
     if(ctx.cookies.get('username')){
+      let uid = ctx.cookies.get('uid')
+      // 取到用户头像和权限
+      const {avatar,role} = await User.findById(uid)
       ctx.session = {
         username:ctx.cookies.get('username'),
-        uid:cts.cookies.get('uid')
+        uid,
+        avatar,
+        role
       }
     }
   }
   await next()
+}
+
+exports.upload = async ctx =>{
+  // 取出用户上传头像的名字
+  const filename = ctx.req.file.filename
+
+  let data = {}
+
+  await User.updateOne({_id:ctx.session.uid},{ $set: {avatar:'/avatar/'+filename}},err=>{
+    if(err){
+      data = {
+        status:0,
+        message:'上传失败'
+      }
+      return
+    }else{
+      data = {
+        status:1,
+        message:'上传成功'
+      }
+    }
+  })
+
+  ctx.body = data
 }

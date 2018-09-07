@@ -12,8 +12,14 @@ const UserSchema = new Schema({
     type:String,
     default:'/avatar/default.jpg'
   },
-  articleNum: Number,
-  commentNum: Number
+  articleNum: {//默认文章数0
+    type:Number,
+    default:0
+  },
+  commentNum: {//默认评论数0
+    type:Number,
+    default:0
+  }
 },{versionKey:false})
 
 module.exports = UserSchema

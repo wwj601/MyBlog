@@ -121,3 +121,56 @@ exports.details = async ctx=>{
     session:ctx.session
   })
 }
+
+// 获取用户列表
+exports.artlist = async ctx =>{
+  // 获取用户id
+  const uid = ctx.session.uid
+  // 从数据库查询该用户所有文章
+  const data = await Article.find({author:uid})
+
+  ctx.body = {
+    code:0,
+    count:data.length,
+    data
+  }
+}
+
+// 删除对应的文章
+exports.del = async ctx=>{
+  // 对应文章的id user id
+  const articleId = ctx.params.id
+  const userId = ctx.session.uid
+  let len,
+      res={};
+
+  // 获取所有文章的评论个数
+  await Comment.find({article:articleId},(err ,data)=>{
+    if(err) return console.log(err)
+    len = data.length
+  })
+  // 删除对应文章的所有评论
+  await Comment.deleteMany({article:articleId})
+  // 更新评论数量
+  await User.updateOne({_id:userId},{$inc:{commentNum:-len}})
+
+  // 删除文章
+  await Article.deleteOne({_id:articleId},(err,data)=>{
+    if(err){
+      res = {
+        state:0,
+        message:'删除失败'
+      }
+      return
+    }else{
+      res = {
+        state:1,
+        message:'删除成功'
+      }
+    }
+  })
+  // 更新文章数量
+  await User.updateOne({_id:userId},{$inc:{articleNum:-1}})
+
+  ctx.body = res
+}

@@ -3,6 +3,7 @@ const user = require('../control/user')
 const article = require('../control/article')
 const comment = require('../control/comment')
 const admin = require('../control/admin')
+const upload = require('../util/upload')
 const router = new Router()
 
 // 渲染主页
@@ -41,9 +42,30 @@ router.post('/comment',user.keepLog, comment.save)
 // 个人中心 文章 评论 头像上传
 router.get('/admin/:id',user.keepLog,admin.index)
 
+
+// 后台：上传头像
+router.post('/upload',user.keepLog,upload.single('file'),user.upload)
+
+// 后台：获取用户所有评论
+router.get('/user/comments',user.keepLog,comment.comlist)
+
+// 后台：删除评论
+router.del('/comment/:id',user.keepLog,comment.del)
+
+// 后台：获取用户文章列表
+router.get('/user/articles',user.keepLog,article.artlist)
+
+// 后台：删除用户文章
+router.del('/article/:id',user.keepLog,article.del)
+
+// 超级管理员获取数据
+router.get('/user/users',user.keepLog,admin.account)
+
+router.del('/user/:id',user.keepLog,admin.del)
+
 // 404页面
 router.get('*',async ctx=>{
-    await ctx.body('404',{
+    await ctx.render('404',{
         title:404
     })
 })

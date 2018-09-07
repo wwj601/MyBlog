@@ -38,6 +38,7 @@ exports.index = async ctx =>{
   })
 
   if(flag){
+
     await ctx.render('./admin/admin-'+ id,{
       role:ctx.session.role
     })
@@ -46,5 +47,36 @@ exports.index = async ctx =>{
     await ctx.render('404',{
       title:'404'
     })
+  }
+}
+
+// 获取管理用户信息
+exports.account = async ctx =>{
+  const uid = ctx.session.uid
+
+  // 查找所有用户
+  const data = await User.find()
+
+  ctx.body = {
+    code:0,
+    data,
+    count:data.length
+  }
+}
+
+// 删除用户 及以下的所有评论和文章
+exports.del = async ctx =>{
+  const userId = ctx.params.id
+  
+  // 删除这个用户
+  await User.deleteOne({_id:userId})
+  // 删除这个用户所有的文章
+  await Article.deleteMany({author:userId})
+  // 删除这个用户所有的评论
+  await Comment.deleteMany({from:userId})
+
+  ctx.body = {
+    state:1,
+    message:'删除成功'
   }
 }
