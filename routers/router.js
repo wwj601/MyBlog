@@ -61,6 +61,7 @@ router.del('/article/:id',user.keepLog,article.del)
 // 超级管理员获取数据
 router.get('/user/users',user.keepLog,admin.account)
 
+// 删除用户
 router.del('/user/:id',user.keepLog,admin.del)
 
 // 404页面
