@@ -6,7 +6,7 @@ const body = require('koa-body')
 const router = require('./routers/router')
 const { join } = require('path')
 const session = require('koa-session')
-
+const compress = require('koa-compress')
 // 生成koa实例
 const app = new Koa()
 
@@ -28,6 +28,11 @@ app.use(session(CONFIG, app))
 // // 生成日志模板
 // app.use(logger())
 
+// 注册资源压缩模块 compress
+app.use(compress({
+    threshold: 2048,
+    flush: require('zlib').Z_SYNC_FLUSH
+}))
 
 // 配置 koa-body 处理 post 请求数据
 app.use(body())
